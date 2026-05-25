@@ -2,38 +2,14 @@ package main
 
 import (
 	"log"
-	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/thesouldev/goboxd/internal"
 )
 
 func main() {
-	log.Println("Starting goboxd...")
+	app := internal.NewServer()
+	if err := app.Router.Run(); err != nil {
+		log.Fatalln("Could not start app due to: ", err)
+	}
 
-	code_runner := new(internal.CodeRunner)
-
-	code_runner.Initialize()
-	
-	router := gin.Default()
-	
-	// Registering endpoints
-	router.GET("healthz", getHealth)
-	router.POST("run", postRun)
-
-	router.Run(":8080")
-}
-
-func getHealth(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-	})
-}
-
-func postRun(c *gin.Context) {
-	
-	
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-	})
 }
