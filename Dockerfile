@@ -33,7 +33,11 @@ FROM debian:${DEBIAN_VERSION}-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates libnl-route-3-200 libprotobuf32 \
     && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
 COPY --from=nsjail-builder /usr/local/bin/nsjail /usr/local/bin/nsjail
 COPY --from=builder        /out/goboxd          /usr/local/bin/goboxd
+
+COPY config/ ./config/
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/goboxd"]
