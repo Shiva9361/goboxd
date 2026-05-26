@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	app := internal.NewServer()
-	if err := app.Router.Run(); err != nil {
-		log.Fatalln("Could not start app due to: ", err)
+	server := internal.NewServer()
+	if err := server.Router.Run(); err != nil {
+		log.Fatalln("Could not start server due to: ", err)
 	}
 
 }

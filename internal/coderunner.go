@@ -6,12 +6,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Resource is self explantory
 type Resource struct {
-	WallTime   int `mapstructure:"wall_time_s"`
-	Memory     int `mapstructure:"memory_kb"`
-	MaxProcess int `mapstructure:"max_process"`
+	WallTime   int `mapstructure:"wall_time_s" json:"wall_time_s"`
+	Memory     int `mapstructure:"memory_kb" json:"memory_kb"`
+	MaxProcess int `mapstructure:"max_processes" json:"max_processes"`
 }
 
+// Options represents the command, arguments, resource limits, and flags for either the build or run phase of code execution.
 type Options struct {
 	Cmd    string   `mapstructure:"cmd"`
 	Args   []string `mapstructure:"args"`
@@ -19,6 +21,7 @@ type Options struct {
 	Flags  []string `mapstructure:"flag_allowlist"`
 }
 
+// CodeConfig represents the configuration for a single programming language, including how to build and run code in that language.
 type CodeConfig struct {
 	ID              string  `mapstructure:"id"`
 	Name            string  `mapstructure:"name"`
@@ -28,9 +31,51 @@ type CodeConfig struct {
 	Run_options     Options `mapstructure:"run"`
 }
 
+// CodeRunner is the main struct that holds all the config for supported languages and a map for quick lookup
 type CodeRunner struct {
 	Configs   []CodeConfig
 	ConfigMap map[string]int // felt this is cleaner
+}
+
+// ExecutionRequest represents the incoming JSON payload.
+type ExecutionRequest struct {
+	Language         string      `json:"language"`
+	Source           string      `json:"source"`
+	SourceFilename   string      `json:"source_filename"`
+	ArtifactFilename string      `json:"artifact_filename"`
+	Build            PhaseConfig `json:"build"`
+	Run              PhaseConfig `json:"run"`
+	Tests            []TestCase  `json:"tests"`
+}
+
+// PhaseConfig holds the limits and flags for either build or run phases.
+type PhaseConfig struct {
+	Limits Resource `json:"limits"`
+	Flags  []string `json:"flags"`
+}
+
+// TestCase represents a single stdin/stdout test pair.
+type TestCase struct {
+	Stdin          string `json:"stdin"`
+	ExpectedStdout string `json:"expected_stdout"`
+}
+
+// ExecutionResponse is the final payload sent back to the client.
+type ExecutionResponse struct {
+	Status string       `json:"status"`
+	Build  *ExecResult  `json:"build,omitempty"`
+	Tests  []ExecResult `json:"tests"`
+}
+
+// PhaseResult represents the outcome of the compilation step.
+
+// TestResult represents the outcome of a single runtime test case.
+type ExecResult struct {
+	Status       string `json:"status"`
+	Stdout       string `json:"stdout"`
+	Stderr       string `json:"stderr"`
+	DurationMs   int64  `json:"duration_ms"`
+	MemoryPeakKb int64  `json:"memory_peak_kb"`
 }
 
 // Initialize is used to load up all the config yaml
@@ -55,4 +100,21 @@ func (c *CodeRunner) Initialize() {
 		c.ConfigMap[config.ID] = i
 	}
 
+}
+
+func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workdir string) ExecResult {
+	uid := getUniqueUID()
+	defer releaseUID(uid)
+
+	result := ExecResult{}
+
+	if cmd == "" {
+		return result
+	}
+
+	// args:= []string{
+	// 	""
+	// }
+
+	return result
 }
