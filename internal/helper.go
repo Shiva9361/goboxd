@@ -5,7 +5,7 @@ import "strings"
 func prepArgs(template []string, flags []string, source string, artifact string) []string {
 	args := make([]string, 0, len(template)+len(flags))
 
-	for _, arg := range args {
+	for _, arg := range template {
 		if arg == "{{flags}}" {
 			args = append(args, flags...)
 			continue

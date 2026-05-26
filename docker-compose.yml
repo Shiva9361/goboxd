@@ -3,6 +3,11 @@ services:
     build:
       context: .
       target: runtime
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfined
+    cap_add:
+      - SYS_ADMIN
     image: goboxd:dev
     container_name: goboxd
     ports:

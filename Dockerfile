@@ -32,6 +32,9 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/goboxd ./cmd/gobox
 FROM debian:${DEBIAN_VERSION}-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates libnl-route-3-200 libprotobuf32 \
+        build-essential \
+        python3 \
+        default-jdk \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

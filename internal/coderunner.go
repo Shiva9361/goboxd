@@ -1,7 +1,11 @@
 package internal
 
 import (
+	"bytes"
+	"fmt"
 	"log"
+	"os/exec"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -102,19 +106,57 @@ func (c *CodeRunner) Initialize() {
 
 }
 
-func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workdir string) ExecResult {
-	uid := getUniqueUID()
-	defer releaseUID(uid)
-
+func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
 	result := ExecResult{}
-
 	if cmd == "" {
 		return result
 	}
 
-	// args:= []string{
-	// 	""
-	// }
+	uid := getUniqueUID()
+	defer releaseUID(uid)
+
+	nsjailArgs := []string{ // TODO: migrate these args to a config file too
+		"-Mo", "--quiet",
+		"--user", uid, "--group", uid,
+		"-E", "PATH=/usr/local/bin:/usr/bin:/bin",
+		"-E", "MALLOC_ARENA_MAX=2",
+		"--chroot", "/",
+		"-R", "/etc",
+		"-B", fmt.Sprintf("%s:/app", workDir),
+		"-T", "/tmp",
+		"--time_limit", fmt.Sprintf("%d", resource.WallTime),
+		"--rlimit_as", fmt.Sprintf("%d", resource.Memory/1000),
+		"--cwd", "/app",
+		"--",
+		cmd,
+	}
+
+	nsjailArgs = append(nsjailArgs, args...)
+
+	execution := exec.Command("nsjail", nsjailArgs...)
+
+	var stdoutBuf, stderrBuf bytes.Buffer
+
+	if stdInput != "" {
+		execution.Stdin = strings.NewReader(stdInput)
+	}
+
+	execution.Stderr = &stderrBuf
+	execution.Stdout = &stdoutBuf
+
+	err := execution.Run()
+
+	result.Status = "ok"
+	result.Stderr = stderrBuf.String()
+
+	log.Println("err: ", result.Stderr)
+	result.Stdout = stdoutBuf.String()
+
+	if err != nil {
+		result.Status = "failed"
+		log.Println("Exec failed with : ", err)
+		return result
+	}
 
 	return result
 }

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -104,6 +105,7 @@ func (server *Server) postRun(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create file for execution",
 		})
+		return
 	}
 
 	res := ExecutionResponse{
@@ -122,8 +124,13 @@ func (server *Server) postRun(c *gin.Context) {
 
 	runArgs := prepArgs(currentConfig.Run_options.Args, req.Run.Flags, req.SourceFilename, req.ArtifactFilename)
 
+	runCmd := strings.ReplaceAll(currentConfig.Run_options.Cmd, "{{artifact}}", req.ArtifactFilename)
+
 	for _, input := range req.Tests {
-		out := ExecuteSandboxed(currentConfig.Run_options.Cmd, runArgs, req.Run.Limits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
+		out := ExecuteSandboxed(runCmd, runArgs, req.Run.Limits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
+		if out.Stdout != input.ExpectedStdout {
+			out.Status = "wrong output"
+		}
 		res.Tests = append(res.Tests, out)
 	}
 
