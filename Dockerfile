@@ -32,15 +32,22 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/goboxd ./cmd/gobox
 FROM debian:${DEBIAN_VERSION}-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates libnl-route-3-200 libprotobuf32 \
-        build-essential \
-        python3 \
-        default-jdk \
-    && rm -rf /var/lib/apt/lists/*
+        build-essential
 
 WORKDIR /app
+
+# --- Installing required language runtimes and tools ---
+
+COPY scripts/ ./scripts/
+
+RUN chmod +x /app/scripts/install.sh && /app/scripts/install.sh
+
+RUN rm -rf /var/lib/apt/lists/*
+
 COPY --from=nsjail-builder /usr/local/bin/nsjail /usr/local/bin/nsjail
 COPY --from=builder        /out/goboxd          /usr/local/bin/goboxd
 
 COPY config/ ./config/
+ENV PORT 8080
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/goboxd"]

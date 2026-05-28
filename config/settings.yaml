@@ -38,11 +38,11 @@ languages:
     source_filename_strategy: from_request
     artifact_filename_strategy: from_request  
     build:
-      cmd: /usr/bin/javac
+      cmd: /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
       args: ["{{flags}}", "{{source}}"]
       limits: { wall_time_s: 6, memory_kb: 1024000, max_processes: 100 }
     run:
-      cmd: /usr/bin/java
+      cmd: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
       args: ["{{artifact}}"]
       limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
 
