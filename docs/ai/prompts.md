@@ -38,3 +38,19 @@ how to make a struct for a yaml file for unmarshall with viper
 Provided the nested Go structs using `mapstructure` tags and explained how to unmarshal a YAML array/slice using `viper.UnmarshalKey`.
 **What we used / didn't use:**
 Used nested structs with `mapstructure` tags to handle snake_case YAML keys, discarding standard `yaml` struct tags.
+
+## [2026-05-28] [Context: Writing Tests in Go]
+**Prompt:**
+how to write tests in go?
+**Response summary:**
+Explained that Go uses the `testing` package for writing tests. Test functions must start with `Test` and take a `*testing.T` parameter. Provided an example of a simple test function that checks if a function returns the expected result.
+**What we used / didn't use:**
+Used the `testing` package and followed the convention of naming test functions with a `Test` prefix. Discarded any third-party testing frameworks for now, sticking to Go's built-in capabilities.
+
+## [2026-05-28] [Context: Generating json files for testing]
+**Prompt:**
+Generate 5 json files for languages python, c, c++ for using in the testing 
+**Response summary:**
+Generated the required JSON files with varied code for each language testing
+**What we used / didn't use:**
+Given that the test files were exactly what i needed, I used them directly. Would have taken a lot more time for me to write them by hand.
