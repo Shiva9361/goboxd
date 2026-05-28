@@ -37,8 +37,9 @@ type CodeConfig struct {
 
 // CodeRunner is the main struct that holds all the config for supported languages and a map for quick lookup
 type CodeRunner struct {
-	Configs   []CodeConfig
-	ConfigMap map[string]int // felt this is cleaner
+	Configs     []CodeConfig
+	NsjailFlags []string
+	ConfigMap   map[string]int // felt this is cleaner
 }
 
 // ExecutionRequest represents the incoming JSON payload.
@@ -98,6 +99,8 @@ func (c *CodeRunner) Initialize() {
 		log.Panicln("Failed to parse config file with: ", err)
 	}
 
+	c.NsjailFlags = viper.GetStringSlice("nsjail_flags")
+
 	c.ConfigMap = make(map[string]int)
 
 	for i, config := range c.Configs {
@@ -106,7 +109,7 @@ func (c *CodeRunner) Initialize() {
 
 }
 
-func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
+func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
 	result := ExecResult{}
 	if cmd == "" {
 		return result
@@ -115,21 +118,18 @@ func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput str
 	uid := getUniqueUID()
 	defer releaseUID(uid)
 
-	nsjailArgs := []string{ // TODO: migrate these args to a config file too
-		"-Mo", "--quiet",
+	nsjailArgs := []string{
 		"--user", uid, "--group", uid,
-		"-E", "PATH=/usr/local/bin:/usr/bin:/bin",
-		"-E", "MALLOC_ARENA_MAX=2",
-		"--chroot", "/",
-		"-R", "/etc",
 		"-B", fmt.Sprintf("%s:/app", workDir),
-		"-T", "/tmp",
 		"--time_limit", fmt.Sprintf("%d", resource.WallTime),
 		"--rlimit_as", fmt.Sprintf("%d", resource.Memory/1024),
-		"--cwd", "/app",
-		"--",
-		cmd,
 	}
+
+	nsjailArgs = append(nsjailArgs, c.NsjailFlags...)
+
+	nsjailArgs = append(nsjailArgs, "--")
+
+	nsjailArgs = append(nsjailArgs, cmd)
 
 	nsjailArgs = append(nsjailArgs, args...)
 

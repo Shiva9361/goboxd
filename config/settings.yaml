@@ -32,3 +32,10 @@ languages:
       cmd: /usr/bin/java
       args: ["{{artifact}}"]
       limits: { wall_time_s: 6, memory_kb: 102400, max_processes: 100 }
+
+nsjail_flags: ["-Mo", "--quiet",
+    "-E", "PATH=/usr/local/bin:/usr/bin:/bin",
+    "--chroot", "/",
+    "-R", "/etc",
+    "-T", "/tmp",
+    "--cwd", "/app"]

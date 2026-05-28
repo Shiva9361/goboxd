@@ -116,7 +116,7 @@ func (server *Server) postRun(c *gin.Context) {
 
 	buildArgs := prepArgs(currentConfig.Build_options.Args, req.Build.Flags, req.SourceFilename, req.ArtifactFilename)
 	// Build
-	buildResult := ExecuteSandboxed(currentConfig.Build_options.Cmd, buildArgs, currentConfig.Build_options.Limits, "", workDir)
+	buildResult := server.Runner.ExecuteSandboxed(currentConfig.Build_options.Cmd, buildArgs, currentConfig.Build_options.Limits, "", workDir)
 
 	if buildResult.Status != "" {
 		res.Build = &buildResult
@@ -127,7 +127,7 @@ func (server *Server) postRun(c *gin.Context) {
 	runCmd := strings.ReplaceAll(currentConfig.Run_options.Cmd, "{{artifact}}", req.ArtifactFilename)
 
 	for _, input := range req.Tests {
-		out := ExecuteSandboxed(runCmd, runArgs, req.Run.Limits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
+		out := server.Runner.ExecuteSandboxed(runCmd, runArgs, req.Run.Limits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
 		if out.Stdout != input.ExpectedStdout {
 			out.Status = "wrong output"
 		}
