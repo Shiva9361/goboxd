@@ -1,0 +1,27 @@
+{
+  "name": "C++ Sum Digits",
+  "language": "cpp",
+  "source_filename": "solution.cpp",
+  "artifact_filename": "solution",
+  "source": "#include <iostream>\n#include <string>\n\nint main() {\n    std::string s;\n    while (std::cin >> s) {\n        long long sum = 0;\n        for (char c : s) {\n            if (isdigit(c)) sum += (c - '0');\n        }\n        std::cout << sum << std::endl;\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall", "-std=c++20"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "12345\n987654321\n",
+      "expected_stdout": "15\n45\n"
+    }
+  ]
+}

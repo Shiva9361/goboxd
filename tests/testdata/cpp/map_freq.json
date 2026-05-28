@@ -1,0 +1,27 @@
+{
+  "name": "C++ Map Freq",
+  "language": "cpp",
+  "source_filename": "solution.cpp",
+  "artifact_filename": "solution",
+  "source": "#include <iostream>\n#include <map>\n#include <string>\n\nint main() {\n    std::map<std::string, int> freq;\n    std::string word;\n    while (std::cin >> word) {\n        freq[word]++;\n    }\n    for (auto const& [key, val] : freq) {\n        std::cout << key << \": \" << val << std::endl;\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall", "-std=c++20"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "apple banana apple orange banana apple\n",
+      "expected_stdout": "apple: 3\nbanana: 2\norange: 1\n"
+    }
+  ]
+}

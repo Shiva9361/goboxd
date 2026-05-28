@@ -1,0 +1,27 @@
+{
+  "name": "Python 3 Classes",
+  "language": "py3",
+  "source_filename": "solution.py",
+  "artifact_filename": "solution.py",
+  "source": "import sys\n\nclass Calculator:\n    def add(self, a, b):\n        return a + b\n    def sub(self, a, b):\n        return a - b\n\ncalc = Calculator()\nfor line in sys.stdin:\n    parts = line.split()\n    if len(parts) == 3:\n        op, a, b = parts[0], int(parts[1]), int(parts[2])\n        if op == 'add':\n            print(calc.add(a, b))\n        elif op == 'sub':\n            print(calc.sub(a, b))",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 0,
+      "memory_kb": 0
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 262144
+    }
+  },
+  "tests": [
+    {
+      "stdin": "add 5 3\nsub 10 4\n",
+      "expected_stdout": "8\n6\n"
+    }
+  ]
+}

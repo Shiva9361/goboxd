@@ -1,0 +1,27 @@
+{
+  "name": "C++ Vector Sort",
+  "language": "cpp",
+  "source_filename": "solution.cpp",
+  "artifact_filename": "solution",
+  "source": "#include <iostream>\n#include <vector>\n#include <string>\n#include <algorithm>\n\nint main() {\n    int n;\n    while (std::cin >> n) {\n        std::vector<std::string> v(n);\n        for (int i = 0; i < n; i++) std::cin >> v[i];\n        std::sort(v.begin(), v.end());\n        for (int i = 0; i < n; i++) std::cout << v[i] << (i == n-1 ? \"\" : \" \");\n        std::cout << std::endl;\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall", "-std=c++20"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "3\nzebra apple banana\n",
+      "expected_stdout": "apple banana zebra\n"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "C Factorial",
+  "language": "c",
+  "source_filename": "solution.c",
+  "artifact_filename": "solution",
+  "source": "#include <stdio.h>\n\nlong long factorial(int n) {\n    if (n == 0) return 1;\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int n;\n    while (scanf(\"%d\", &n) == 1) {\n        printf(\"%lld\\n\", factorial(n));\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n10\n0\n",
+      "expected_stdout": "120\n3628800\n1\n"
+    }
+  ]
+}

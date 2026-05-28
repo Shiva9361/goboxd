@@ -1,0 +1,27 @@
+{
+  "name": "C Prime Check",
+  "language": "c",
+  "source_filename": "solution.c",
+  "artifact_filename": "solution",
+  "source": "#include <stdio.h>\n#include <stdbool.h>\n\nbool is_prime(int n) {\n    if (n <= 1) return false;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) return false;\n    }\n    return true;\n}\n\nint main() {\n    int n;\n    while (scanf(\"%d\", &n) == 1) {\n        if (is_prime(n)) printf(\"YES\\n\");\n        else printf(\"NO\\n\");\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "7\n10\n13\n1\n",
+      "expected_stdout": "YES\nNO\nYES\nNO\n"
+    }
+  ]
+}

@@ -15,14 +15,20 @@ RUN git clone --depth 1 --branch ${NSJAIL_VERSION} https://github.com/google/nsj
     && make -C /src/nsjail \
     && install -m 0755 /src/nsjail/nsjail /usr/local/bin/nsjail
 
-# ---- Builder / dev image (Go + linters + nsjail) ----
+# ---- Builder / dev image (Go + linters + nsjail + compilers) ----
 FROM golang:${GO_VERSION}-${DEBIAN_VERSION} AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libnl-route-3-200 libprotobuf32 \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=nsjail-builder /usr/local/bin/nsjail /usr/local/bin/nsjail
-RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+# --- Installing required language runtimes and tools for testing ---
 WORKDIR /src
+COPY scripts/ ./scripts/
+RUN chmod +x ./scripts/install.sh && ./scripts/install.sh && rm -rf /var/lib/apt/lists/*
+
+RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 COPY go.mod ./
 RUN go mod download
 COPY . .

@@ -1,0 +1,27 @@
+{
+  "name": "C++ Palindrome",
+  "language": "cpp",
+  "source_filename": "solution.cpp",
+  "artifact_filename": "solution",
+  "source": "#include <iostream>\n#include <string>\n#include <algorithm>\n\nint main() {\n    std::string s;\n    while (std::cin >> s) {\n        std::string rev = s;\n        std::reverse(rev.begin(), rev.end());\n        if (s == rev) std::cout << \"YES\" << std::endl;\n        else std::cout << \"NO\" << std::endl;\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall", "-std=c++20"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "racecar\nhello\nmadam\n",
+      "expected_stdout": "YES\nNO\nYES\n"
+    }
+  ]
+}

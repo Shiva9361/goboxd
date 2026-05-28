@@ -1,0 +1,27 @@
+{
+  "name": "C String Reverse",
+  "language": "c",
+  "source_filename": "solution.c",
+  "artifact_filename": "solution",
+  "source": "#include <stdio.h>\n#include <string.h>\n\nvoid reverse(char* s) {\n    int i = 0, j = strlen(s) - 1;\n    while (i < j) {\n        char temp = s[i];\n        s[i] = s[j];\n        s[j] = temp;\n        i++; j--;\n    }\n}\n\nint main() {\n    char s[100];\n    while (scanf(\"%s\", s) == 1) {\n        reverse(s);\n        printf(\"%s\\n\", s);\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "hello\ngoboxd\n",
+      "expected_stdout": "olleh\ndxobog\n"
+    }
+  ]
+}

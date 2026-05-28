@@ -1,0 +1,27 @@
+{
+  "name": "C Matrix Add",
+  "language": "c",
+  "source_filename": "solution.c",
+  "artifact_filename": "solution",
+  "source": "#include <stdio.h>\n\nint main() {\n    int r, c;\n    if (scanf(\"%d %d\", &r, &c) != 2) return 0;\n    int a[r][c], b[r][c];\n    for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) scanf(\"%d\", &a[i][j]);\n    for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) scanf(\"%d\", &b[i][j]);\n    for (int i = 0; i < r; i++) {\n        for (int j = 0; j < c; j++) {\n            printf(\"%d \", a[i][j] + b[i][j]);\n        }\n        printf(\"\\n\");\n    }\n    return 0;\n}",
+  "build": {
+    "flags": ["-O2", "-Wall"],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 262144
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "2 2\n1 2\n3 4\n5 6\n7 8\n",
+      "expected_stdout": "6 8 \n10 12 \n"
+    }
+  ]
+}
