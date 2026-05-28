@@ -125,7 +125,7 @@ func ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput str
 		"-B", fmt.Sprintf("%s:/app", workDir),
 		"-T", "/tmp",
 		"--time_limit", fmt.Sprintf("%d", resource.WallTime),
-		"--rlimit_as", fmt.Sprintf("%d", resource.Memory/1000),
+		"--rlimit_as", fmt.Sprintf("%d", resource.Memory/1024),
 		"--cwd", "/app",
 		"--",
 		cmd,
