@@ -20,22 +20,37 @@ languages:
       cmd: ./{{artifact}}
       limits: { wall_time_s: 3, memory_kb: 524288, max_processes: 64 }
 
+  - id: c
+    name: c
+    source: solution.c
+    artifact: solution
+    build:
+      cmd: /usr/bin/gcc
+      args: ["{{flags}}", "-o", "{{artifact}}", "{{source}}"]
+      limits: { wall_time_s: 3, memory_kb: 1048576, max_processes: 100 }
+      flag_allowlist: ["-O0","-O1","-O2","-O3","-Wall","-Wextra","-std=*"]
+    run:
+      cmd: ./{{artifact}}
+      limits: { wall_time_s: 3, memory_kb: 524288, max_processes: 64 }
+
   - id: java
     name: Java
     source_filename_strategy: from_request
-    artifact_filename_strategy: from_request
+    artifact_filename_strategy: from_request  
     build:
       cmd: /usr/bin/javac
       args: ["{{flags}}", "{{source}}"]
-      limits: { wall_time_s: 6, memory_kb: 102400, max_processes: 100 }
+      limits: { wall_time_s: 6, memory_kb: 1024000, max_processes: 100 }
     run:
       cmd: /usr/bin/java
       args: ["{{artifact}}"]
-      limits: { wall_time_s: 6, memory_kb: 102400, max_processes: 100 }
+      limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
 
 nsjail_flags: ["-Mo", "--quiet",
     "-E", "PATH=/usr/local/bin:/usr/bin:/bin",
     "--chroot", "/",
     "-R", "/etc",
     "-T", "/tmp",
-    "--cwd", "/app"]
+    "--cwd", "/app",
+    # "-v"
+    ]

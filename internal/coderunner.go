@@ -133,6 +133,8 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	nsjailArgs = append(nsjailArgs, args...)
 
+	log.Println("Running command: ", cmd, " with args: ", args, " and nsjail args: ", nsjailArgs)
+
 	execution := exec.Command("nsjail", nsjailArgs...)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
