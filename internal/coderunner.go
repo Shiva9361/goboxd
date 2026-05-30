@@ -72,8 +72,6 @@ type ExecutionResponse struct {
 	Tests  []ExecResult `json:"tests"`
 }
 
-// PhaseResult represents the outcome of the compilation step.
-
 // TestResult represents the outcome of a single runtime test case.
 type ExecResult struct {
 	Status       string `json:"status"`
@@ -109,6 +107,7 @@ func (c *CodeRunner) Initialize() {
 
 }
 
+// ExecuteSanboxed is the wrapper function for running the code in nsjail
 func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
 	result := ExecResult{}
 	if cmd == "" {
@@ -133,7 +132,7 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	nsjailArgs = append(nsjailArgs, args...)
 
-	log.Println("Running command: ", cmd, " with args: ", args, " and nsjail args: ", nsjailArgs)
+	// log.Println("Running command: ", cmd, " with args: ", args, " and nsjail args: ", nsjailArgs)
 
 	execution := exec.Command("nsjail", nsjailArgs...)
 

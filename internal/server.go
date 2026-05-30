@@ -23,7 +23,7 @@ var activeUIDs sync.Map
 
 // getUniqueUID generates a random UID and ensures it is not currently in use
 func getUniqueUID() string {
-	for {
+	for { // this basically makes a tread wait until it can get a unique UID
 		n, err := rand.Int(rand.Reader, big.NewInt(100000))
 		if err != nil {
 			log.Panicln("Failed to generate random number:", err)
@@ -100,7 +100,23 @@ func (server *Server) postRun(c *gin.Context) {
 
 	defer os.RemoveAll(workDir) // cleanup
 
-	sourcePath := filepath.Join(workDir, req.SourceFilename) // TODO: Should use default if not there
+	currentConfig := server.Runner.Configs[server.Runner.ConfigMap[req.Language]]
+
+	// Sanitize source and artifact file names
+
+	if req.SourceFilename == "" {
+		req.SourceFilename = currentConfig.Source_filename
+	}
+
+	req.SourceFilename = filepath.Base(req.SourceFilename) // simple but effective ;)
+
+	if req.ArtifactFilename == "" {
+		req.ArtifactFilename = currentConfig.Artifact
+	}
+
+	req.ArtifactFilename = filepath.Base(req.ArtifactFilename)
+
+	sourcePath := filepath.Join(workDir, req.SourceFilename)
 	if err := os.WriteFile(sourcePath, []byte(req.Source), 0644); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create file for execution",
@@ -111,8 +127,6 @@ func (server *Server) postRun(c *gin.Context) {
 	res := ExecutionResponse{
 		Status: "ok",
 	}
-
-	currentConfig := server.Runner.Configs[server.Runner.ConfigMap[req.Language]]
 
 	buildArgs := prepArgs(currentConfig.Build_options.Args, req.Build.Flags, req.SourceFilename, req.ArtifactFilename)
 	// Build
