@@ -169,7 +169,7 @@ func (server *Server) postRun(c *gin.Context) {
 			if trimmedOutput == input.ExpectedStdout {
 				out.Status = "output_whitespace_mismatch"
 			} else {
-				out.Status = "wrong output"
+				out.Status = "wrong_output"
 			}
 
 		} else {
