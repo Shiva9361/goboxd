@@ -141,6 +141,12 @@ func (server *Server) postRun(c *gin.Context) {
 		res.Build = &buildResult
 	}
 
+	if buildResult.Status != "ok" {
+		res.Status = "build_failed"
+		c.JSON(http.StatusOK, res)
+		return
+	}
+
 	runFlags := sanitizeFlags(req.Run.Flags, server.Runner.RunFlagsLookup[server.Runner.ConfigMap[req.Language]])
 
 	runArgs := prepArgs(currentConfig.RunOptions.Args, runFlags, req.SourceFilename, req.ArtifactFilename)
@@ -152,7 +158,14 @@ func (server *Server) postRun(c *gin.Context) {
 	for _, input := range req.Tests {
 		out := server.Runner.ExecuteSandboxed(runCmd, runArgs, runLimits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
 		if out.Stdout != input.ExpectedStdout {
-			out.Status = "wrong output"
+
+			trimmedOutput := strings.TrimSpace(out.Stdout)
+
+			if trimmedOutput == input.ExpectedStdout {
+				out.Status = "output_whitespace_mismatch"
+			} else {
+				out.Status = "wrong output"
+			}
 		}
 		res.Tests = append(res.Tests, out)
 	}

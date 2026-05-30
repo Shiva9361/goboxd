@@ -73,7 +73,7 @@ type TestCase struct {
 type ExecutionResponse struct {
 	Status string       `json:"status"`
 	Build  *ExecResult  `json:"build,omitempty"`
-	Tests  []ExecResult `json:"tests"`
+	Tests  []ExecResult `json:"tests,omitempty"`
 }
 
 // TestResult represents the outcome of a single runtime test case.
