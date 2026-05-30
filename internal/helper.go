@@ -2,26 +2,50 @@ package internal
 
 import (
 	"cmp"
+	"path"
 	"strings"
 )
 
-func prepArgs(template []string, flags []string, source string, artifact string, flag_allowlist []string) []string {
-	args := make([]string, 0, len(template)+len(flags))
+func buildAllowlist(allowlist []string) FlagLookup {
+	exactMatches := make(map[string]struct{})
+	var patterns []string
 
-	if len(flag_allowlist) > 0 { // sanitize if we have an allowlist else assuming all valid
-		allowedFlags := make(map[string]bool)
-		for _, allowedFlag := range flag_allowlist {
-			allowedFlags[allowedFlag] = true
+	for _, rule := range allowlist {
+		if strings.ContainsAny(rule, "*?[") {
+			patterns = append(patterns, rule)
+		} else {
+			exactMatches[rule] = struct{}{} // this is apparently efficient set in GO
 		}
+	}
+	return FlagLookup{ExactMatches: exactMatches, patterns: patterns}
+}
 
-		filteredFlags := make([]string, 0)
-		for _, flag := range flags {
-			if allowedFlags[flag] {
-				filteredFlags = append(filteredFlags, flag)
+func sanitizeFlags(flags []string, lookup FlagLookup) []string {
+	filteredFlags := make([]string, 0, len(flags))
+
+	for _, flag := range flags {
+		if _, exists := lookup.ExactMatches[flag]; exists {
+			filteredFlags = append(filteredFlags, flag)
+			continue
+		}
+		isAllowed := false
+		for _, pattern := range lookup.patterns {
+			if matched, _ := path.Match(pattern, flag); matched {
+				isAllowed = true
+				break
 			}
 		}
-		flags = filteredFlags
+
+		if isAllowed {
+			filteredFlags = append(filteredFlags, flag)
+		}
 	}
+
+	return filteredFlags
+}
+
+func prepArgs(template []string, flags []string, source string, artifact string) []string {
+	args := make([]string, 0, len(template)+len(flags))
 
 	for _, arg := range template {
 		if arg == "{{flags}}" {

@@ -128,7 +128,9 @@ func (server *Server) postRun(c *gin.Context) {
 		Status: "ok",
 	}
 
-	buildArgs := prepArgs(currentConfig.BuildOptions.Args, req.Build.Flags, req.SourceFilename, req.ArtifactFilename, currentConfig.BuildOptions.FlagsAllowList)
+	buildFlags := sanitizeFlags(req.Build.Flags, server.Runner.BuildFlagsLookup[server.Runner.ConfigMap[req.Language]])
+
+	buildArgs := prepArgs(currentConfig.BuildOptions.Args, buildFlags, req.SourceFilename, req.ArtifactFilename)
 
 	buildLimits := sanitizeLimits(currentConfig.BuildOptions.Limits, req.Build.Limits)
 
@@ -139,7 +141,9 @@ func (server *Server) postRun(c *gin.Context) {
 		res.Build = &buildResult
 	}
 
-	runArgs := prepArgs(currentConfig.RunOptions.Args, req.Run.Flags, req.SourceFilename, req.ArtifactFilename, currentConfig.RunOptions.FlagsAllowList)
+	runFlags := sanitizeFlags(req.Run.Flags, server.Runner.RunFlagsLookup[server.Runner.ConfigMap[req.Language]])
+
+	runArgs := prepArgs(currentConfig.RunOptions.Args, runFlags, req.SourceFilename, req.ArtifactFilename)
 
 	runCmd := strings.ReplaceAll(currentConfig.RunOptions.Cmd, "{{artifact}}", req.ArtifactFilename)
 

@@ -37,9 +37,11 @@ type CodeConfig struct {
 
 // CodeRunner is the main struct that holds all the config for supported languages and a map for quick lookup
 type CodeRunner struct {
-	Configs     []CodeConfig
-	NsjailFlags []string
-	ConfigMap   map[string]int // felt this is cleaner
+	Configs          []CodeConfig
+	NsjailFlags      []string
+	ConfigMap        map[string]int // felt this is cleaner
+	BuildFlagsLookup []FlagLookup
+	RunFlagsLookup   []FlagLookup
 }
 
 // ExecutionRequest represents the incoming JSON payload.
@@ -81,6 +83,11 @@ type ExecResult struct {
 	MemoryPeakKb int64  `json:"memory_peak_kb"`
 }
 
+type FlagLookup struct {
+	ExactMatches map[string]struct{}
+	patterns     []string
+}
+
 // Initialize is used to load up all the config yaml
 // to support all required languages
 func (c *CodeRunner) Initialize() {
@@ -103,6 +110,8 @@ func (c *CodeRunner) Initialize() {
 
 	for i, config := range c.Configs {
 		c.ConfigMap[config.ID] = i
+		c.RunFlagsLookup = append(c.RunFlagsLookup, buildAllowlist(config.RunOptions.FlagsAllowList))
+		c.BuildFlagsLookup = append(c.BuildFlagsLookup, buildAllowlist(config.BuildOptions.FlagsAllowList))
 	}
 
 }
@@ -132,7 +141,7 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	nsjailArgs = append(nsjailArgs, args...)
 
-	// log.Println("Running command: ", cmd, " with args: ", args, " and nsjail args: ", nsjailArgs)
+	log.Println("Running command: ", cmd, " with args: ", args, " and nsjail args: ", nsjailArgs)
 
 	execution := exec.Command("nsjail", nsjailArgs...)
 
