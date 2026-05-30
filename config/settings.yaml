@@ -55,3 +55,4 @@ nsjail_flags: ["-Mo", "--quiet",
     "--log_fd" , "3" # To redirect logs
     # "-v"
     ]
+std_limit: 102400

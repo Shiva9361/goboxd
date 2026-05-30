@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"cmp"
 	"path"
 	"strings"
@@ -75,4 +76,40 @@ func sanitizeLimits(defaultLimits Resource, requestedLimits Resource) Resource {
 	}
 	return limits
 
+}
+
+type CappedWriter struct {
+	buf       bytes.Buffer
+	limit     int
+	written   int
+	truncated bool
+}
+
+func NewCappedWriter(limit int) *CappedWriter {
+	return &CappedWriter{limit: limit}
+}
+
+func (cw *CappedWriter) Write(p []byte) (n int, err error) {
+	if cw.truncated {
+		return len(p), nil // pretend so that segpipe is stopped
+	}
+
+	willWrite := len(p)
+	if cw.written+willWrite > cw.limit {
+		allowed := cw.limit - cw.written
+		cw.buf.Write(p[:allowed])
+		cw.buf.WriteString("[Output Truncated: Exceeded Buffer Limit]")
+		cw.truncated = true
+
+	} else {
+
+		cw.buf.Write(p)
+		cw.written += willWrite
+	}
+
+	return len(p), nil
+}
+
+func (cw *CappedWriter) String() string {
+	return cw.buf.String()
 }

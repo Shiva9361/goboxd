@@ -2,7 +2,6 @@ package internal
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -44,6 +43,7 @@ type CodeRunner struct {
 	ConfigMap        map[string]int // felt this is cleaner
 	BuildFlagsLookup []FlagLookup
 	RunFlagsLookup   []FlagLookup
+	stdlimit         int
 }
 
 // ExecutionRequest represents the incoming JSON payload.
@@ -108,6 +108,12 @@ func (c *CodeRunner) Initialize() {
 
 	c.NsjailFlags = viper.GetStringSlice("nsjail_flags")
 
+	if viper.IsSet("std_limit") {
+		c.stdlimit = viper.GetInt("std_limit")
+	} else {
+		c.stdlimit = 10 * 1024 // 10kb should be fine?
+	}
+
 	c.ConfigMap = make(map[string]int)
 
 	for i, config := range c.Configs {
@@ -159,7 +165,8 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 		}
 	}()
 
-	var stdoutBuf, stderrBuf bytes.Buffer
+	stdoutBuf := CappedWriter{limit: c.stdlimit}
+	stderrBuf := CappedWriter{limit: c.stdlimit}
 
 	if stdInput != "" {
 		execution.Stdin = strings.NewReader(stdInput)
