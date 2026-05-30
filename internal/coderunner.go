@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -123,6 +125,8 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 		return result
 	}
 
+	logReader, logWriter, err := os.Pipe()
+
 	uid := getUniqueUID()
 	defer releaseUID(uid)
 
@@ -145,6 +149,16 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	execution := exec.Command("nsjail", nsjailArgs...)
 
+	execution.ExtraFiles = []*os.File{logWriter}
+
+	go func() {
+		defer logReader.Close()
+		scanner := bufio.NewScanner(logReader)
+		for scanner.Scan() {
+			log.Printf("[NSJAIL %s] %s\n", uid, scanner.Text())
+		}
+	}()
+
 	var stdoutBuf, stderrBuf bytes.Buffer
 
 	if stdInput != "" {
@@ -154,12 +168,14 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 	execution.Stderr = &stderrBuf
 	execution.Stdout = &stdoutBuf
 
-	err := execution.Run()
+	err = execution.Start()
+
+	logWriter.Close()
+
+	err = execution.Wait()
 
 	result.Status = "ok"
 	result.Stderr = stderrBuf.String()
-
-	log.Println("err: ", result.Stderr)
 	result.Stdout = stdoutBuf.String()
 
 	if err != nil {

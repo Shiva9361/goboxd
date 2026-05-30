@@ -54,3 +54,11 @@ Generate 5 json files for languages python, c, c++ for using in the testing
 Generated the required JSON files with varied code for each language testing
 **What we used / didn't use:**
 Given that the test files were exactly what i needed, I used them directly. Would have taken a lot more time for me to write them by hand.
+
+## [2026-05-30] [Context: Generating curl request for testing flag-allowlist]
+**Prompt**
+Generate a curl request for c++ for the server api that we already discussed about to test it's flag allowlist by adding potentially dangerous flags
+**Response summary:**
+Generated the required request
+**What we used / didn't use:**
+Used the request as is and also added it as a test case in cpp 
