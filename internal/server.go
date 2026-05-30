@@ -105,7 +105,7 @@ func (server *Server) postRun(c *gin.Context) {
 	// Sanitize source and artifact file names
 
 	if req.SourceFilename == "" {
-		req.SourceFilename = currentConfig.Source_filename
+		req.SourceFilename = currentConfig.SourceFilename
 	}
 
 	req.SourceFilename = filepath.Base(req.SourceFilename) // simple but effective ;)
@@ -128,17 +128,17 @@ func (server *Server) postRun(c *gin.Context) {
 		Status: "ok",
 	}
 
-	buildArgs := prepArgs(currentConfig.Build_options.Args, req.Build.Flags, req.SourceFilename, req.ArtifactFilename)
+	buildArgs := prepArgs(currentConfig.BuildOptions.Args, req.Build.Flags, req.SourceFilename, req.ArtifactFilename, currentConfig.BuildOptions.FlagsAllowList)
 	// Build
-	buildResult := server.Runner.ExecuteSandboxed(currentConfig.Build_options.Cmd, buildArgs, currentConfig.Build_options.Limits, "", workDir)
+	buildResult := server.Runner.ExecuteSandboxed(currentConfig.BuildOptions.Cmd, buildArgs, currentConfig.BuildOptions.Limits, "", workDir)
 
 	if buildResult.Status != "" {
 		res.Build = &buildResult
 	}
 
-	runArgs := prepArgs(currentConfig.Run_options.Args, req.Run.Flags, req.SourceFilename, req.ArtifactFilename)
+	runArgs := prepArgs(currentConfig.RunOptions.Args, req.Run.Flags, req.SourceFilename, req.ArtifactFilename, currentConfig.RunOptions.FlagsAllowList)
 
-	runCmd := strings.ReplaceAll(currentConfig.Run_options.Cmd, "{{artifact}}", req.ArtifactFilename)
+	runCmd := strings.ReplaceAll(currentConfig.RunOptions.Cmd, "{{artifact}}", req.ArtifactFilename)
 
 	for _, input := range req.Tests {
 		out := server.Runner.ExecuteSandboxed(runCmd, runArgs, req.Run.Limits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things

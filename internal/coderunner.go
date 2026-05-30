@@ -19,20 +19,20 @@ type Resource struct {
 
 // Options represents the command, arguments, resource limits, and flags for either the build or run phase of code execution.
 type Options struct {
-	Cmd    string   `mapstructure:"cmd"`
-	Args   []string `mapstructure:"args"`
-	Limits Resource `mapstructure:"limits"`
-	Flags  []string `mapstructure:"flag_allowlist"`
+	Cmd            string   `mapstructure:"cmd"`
+	Args           []string `mapstructure:"args"`
+	Limits         Resource `mapstructure:"limits"`
+	FlagsAllowList []string `mapstructure:"flag_allowlist"`
 }
 
 // CodeConfig represents the configuration for a single programming language, including how to build and run code in that language.
 type CodeConfig struct {
-	ID              string  `mapstructure:"id"`
-	Name            string  `mapstructure:"name"`
-	Source_filename string  `mapstructure:"source"`
-	Artifact        string  `mapstructure:"artifact"`
-	Build_options   Options `mapstructure:"build"`
-	Run_options     Options `mapstructure:"run"`
+	ID             string  `mapstructure:"id"`
+	Name           string  `mapstructure:"name"`
+	SourceFilename string  `mapstructure:"source"`
+	Artifact       string  `mapstructure:"artifact"`
+	BuildOptions   Options `mapstructure:"build"`
+	RunOptions     Options `mapstructure:"run"`
 }
 
 // CodeRunner is the main struct that holds all the config for supported languages and a map for quick lookup
