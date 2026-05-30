@@ -17,3 +17,8 @@ integration:
 
 lint:
 	$(TOOLS) golangci-lint run ./...
+
+benchmark:
+	$(COMPOSE) up -d goboxd
+	$(TOOLS) hey -c 100 -n 2000 -m POST -T "application/json" -D ./tests/testdata/py3/benchmark.json http://goboxd:8080/run
+	$(COMPOSE) stop goboxd

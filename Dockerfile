@@ -28,7 +28,8 @@ WORKDIR /src
 COPY scripts/ ./scripts/
 RUN chmod +x ./scripts/install.sh && ./scripts/install.sh && rm -rf /var/lib/apt/lists/*
 
-RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest && \
+    go install github.com/rakyll/hey@latest
 COPY go.mod ./
 RUN go mod download
 COPY . .

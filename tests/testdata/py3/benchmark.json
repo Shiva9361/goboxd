@@ -1,0 +1,9 @@
+{
+    "name": "Python Hello World Benchmark",
+    "language": "py3",
+    "source": "print('Hello, World!')",
+    "run": {
+      "flags": [],
+      "limits": { "wall_time_s": 2, "memory_kb": 65536 }
+    }
+  }
