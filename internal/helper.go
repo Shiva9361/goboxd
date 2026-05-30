@@ -1,6 +1,9 @@
 package internal
 
-import "strings"
+import (
+	"cmp"
+	"strings"
+)
 
 func prepArgs(template []string, flags []string, source string, artifact string, flag_allowlist []string) []string {
 	args := make([]string, 0, len(template)+len(flags))
@@ -30,4 +33,22 @@ func prepArgs(template []string, flags []string, source string, artifact string,
 		args = append(args, arg)
 	}
 	return args
+}
+
+func clampResource[T cmp.Ordered](defaultValue T, requestedValue T) T {
+	var zero T
+	if requestedValue > zero && requestedValue < defaultValue {
+		return requestedValue
+	}
+	return defaultValue
+}
+
+func sanitizeLimits(defaultLimits Resource, requestedLimits Resource) Resource {
+	limits := Resource{
+		WallTime:   clampResource(defaultLimits.WallTime, requestedLimits.WallTime), // cool way to write instead of if else
+		Memory:     clampResource(defaultLimits.Memory, requestedLimits.Memory),
+		MaxProcess: clampResource(defaultLimits.MaxProcess, requestedLimits.MaxProcess),
+	}
+	return limits
+
 }
