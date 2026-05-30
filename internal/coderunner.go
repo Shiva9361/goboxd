@@ -155,14 +155,19 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	execution := exec.Command("nsjail", nsjailArgs...)
 
-	execution.ExtraFiles = []*os.File{logWriter}
+	execution.ExtraFiles = []*os.File{logWriter} // Better than simple [ heuristic for sep :)
+
+	nsjailLogChan := make(chan string)
 
 	go func() {
 		defer logReader.Close()
+		var logs strings.Builder
 		scanner := bufio.NewScanner(logReader)
 		for scanner.Scan() {
 			log.Printf("[NSJAIL %s] %s\n", uid, scanner.Text())
+			logs.WriteString(scanner.Text() + "\n")
 		}
+		nsjailLogChan <- logs.String()
 	}()
 
 	stdoutBuf := CappedWriter{limit: c.stdlimit}
@@ -181,13 +186,31 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 
 	err = execution.Wait()
 
+	nsjailLogs := <-nsjailLogChan
+
 	result.Status = "ok"
 	result.Stderr = stderrBuf.String()
 	result.Stdout = stdoutBuf.String()
 
 	if err != nil {
-		result.Status = "failed"
-		log.Println("Exec failed with : ", err)
+
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode := exitErr.ExitCode()
+
+			if strings.Contains(nsjailLogs, "run time >= time limit") {
+				result.Status = "time_exceeded"
+			} else if exitCode == 139 {
+				// SEGV = oom >:(
+				result.Status = "memory_exceeded"
+			} else {
+				result.Status = "runtime_error"
+			}
+
+		} else {
+			result.Status = "internal_error"
+		}
+
+		// log.Println("Exec failed with : ", err)
 		return result
 	}
 

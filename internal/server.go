@@ -143,6 +143,11 @@ func (server *Server) postRun(c *gin.Context) {
 
 	if buildResult.Status != "ok" {
 		res.Status = "build_failed"
+		for range req.Tests {
+			res.Tests = append(res.Tests, ExecResult{
+				Status: "not_executed",
+			})
+		}
 		c.JSON(http.StatusOK, res)
 		return
 	}
@@ -166,6 +171,12 @@ func (server *Server) postRun(c *gin.Context) {
 			} else {
 				out.Status = "wrong output"
 			}
+
+		} else {
+			out.Status = "accepted"
+		}
+		if out.Status != "accepted" && res.Status == "ok" {
+			res.Status = out.Status // the spec said first non accepted stat
 		}
 		res.Tests = append(res.Tests, out)
 	}
