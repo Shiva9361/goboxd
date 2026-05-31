@@ -262,11 +262,10 @@ func (server *Server) getReady(c *gin.Context) {
 
 		uid := <-server.uidPool
 
-		defer func() {
-			server.uidPool <- uid
-		}()
-
 		out := server.Runner.ExecuteSandboxed(uid, config.SmokeOptions.Cmd, config.SmokeOptions.Args, config.SmokeOptions.Limits, "", workDir)
+
+		server.uidPool <- uid
+
 		if out.Status != "ok" && out.Status != "" { // ignoring ones with no smoke test configured (Looking at you java)
 			if res.Status == "ok" {
 				res.Status = "degraded"
