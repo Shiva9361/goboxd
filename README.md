@@ -1,70 +1,45 @@
-<div align="center">
-
 # goboxd
 
-**A Go HTTP service for executing untrusted code in isolated sandboxes.**
-
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Go](https://img.shields.io/badge/Go-1.23-00ADD8.svg?logo=go&logoColor=white)](https://go.dev)
-[![Docker](https://img.shields.io/badge/Docker-Required-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/thesouldev/goboxd/pulls)
-
-</div>
-
----
-
-## Overview
-
-goboxd is an HTTP service written in Go that compiles and runs untrusted code inside isolated sandboxes and returns the result. Optional test cases can be supplied to assert behaviour against expected output. It is built for safe execution of code across many languages, with strict isolation, bounded concurrency, and a plug and play language registry.
+goboxd is a secure code execution service that runs user-provided source code in isolated sandboxes using Linux namespaces and nsjail.
 
 ## Features
 
-- Plug and play language registry driven by YAML
-- Process isolation using Linux namespaces and cgroups
-- Bounded concurrency with request queuing
-- Fully containerised for local development and deployment
-- Per request resource limits for time, memory, and processes
-- Liveness and readiness probes for orchestration
+- **Sandboxed Execution**: Uses nsjail to isolate processes, providing filesystem, network, and resource isolation.
+- **Resource Management**: Enforces limits on wall-time, memory usage, and maximum process count.
+- **Multi-language Support**: Configurable support for C, C++, and Python 3 currently.
+- **API-Driven**: Provides HTTP endpoints for health monitoring, readiness checks, and code execution.
+- **Automated Testing**: Supports executing multiple test cases per request with stdin and expected stdout validation.
 
-## Getting started
+## Installation
 
-### Prerequisites
+1. Clone the repository.
+2. Ensure docker is setup and running
+3. Build the application:
+   ```bash
+   make build
+   ```
 
-- Docker with Compose v2
+## Usage
 
-No Go toolchain or system dependencies are required on the host. Everything runs in containers.
-
-### Installation
-
-```sh
-git clone https://github.com/thesouldev/goboxd.git
-cd goboxd
-make build
+Start the server:
+```bash
+make run
 ```
 
-### Usage
+The server listens on the default Gin port.
 
-```sh
-make run          # start the service on :8080
-make test         # run unit tests
-make integration  # run end to end tests
-make lint         # run static analysis
-```
+### API Endpoints
 
-## Project structure
+- `GET /healthz`: Basic liveness check.
+- `GET /readyz`: Deep readiness check verifying nsjail and configured language runtimes.
+- `POST /run`: Execute code. Requires a JSON payload containing language, source code, and test cases.
 
-```
-.
-├── cmd/goboxd/   binary entry point
-├── internal/     private application packages
-├── docs/         api, languages, security, benchmarks, architecture
-└── tests/        integration tests
-```
+## Configuration
 
-## Contributing
+Language configurations and sandbox flags are managed in `config/settings.yaml`. Each language entry defines build commands, execution commands, and resource limits.
 
-Contributions are welcome. Open an issue to discuss substantial changes before sending a pull request.
+## Documentation
 
-## License
-
-This project is distributed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for the full text.
+Detailed information is available in the `docs/` directory:
+- [Architecture](docs/architecture.md)
+- [API Reference](docs/api.md)
