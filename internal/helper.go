@@ -3,7 +3,11 @@ package internal
 import (
 	"bytes"
 	"cmp"
+	"log"
+	"os"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -112,4 +116,20 @@ func (cw *CappedWriter) Write(p []byte) (n int, err error) {
 
 func (cw *CappedWriter) String() string {
 	return cw.buf.String()
+}
+
+func GetPeakMemory(cgroupPath string) int64 {
+	peakFile := filepath.Join(cgroupPath, "memory.peak")
+	data, err := os.ReadFile(peakFile)
+	if err != nil {
+		log.Printf("Warning: Could not read memory.peak at %s: %v", peakFile, err)
+		return 0
+	}
+
+	bytes, err := strconv.ParseInt(strings.TrimSpace(string(data)), 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return bytes / 1024
 }

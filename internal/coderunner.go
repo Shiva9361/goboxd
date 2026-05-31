@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -137,12 +138,29 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 	uid := getUniqueUID()
 	defer releaseUID(uid)
 
+	cgroupPath, err := os.MkdirTemp("/sys/fs/cgroup", "goboxd_*")
+	if err != nil {
+		log.Printf("Error: Failed to create temporary cgroup directory: %v", err)
+		result.Status = "internal_error"
+		return result
+	}
+
+	defer func() {
+		time.Sleep(50 * time.Millisecond)
+
+		err := os.RemoveAll(cgroupPath)
+		if err != nil {
+			log.Printf("Warning: Failed to remove cgroup directory %s: %v", cgroupPath, err)
+		}
+	}()
+
 	// nsjail r_limit on memory is on virtual memory that is why java and js were both not able to run
 	// cgroups is physical memory limit and works for all languages but requires privileged nsjail :(
 	// For now to let stuff work i am gonna go with cgroups and privileged nsjail
 	nsjailArgs := []string{
 		"--user", uid, "--group", uid,
 		"-B", fmt.Sprintf("%s:/app", workDir),
+		"--cgroupv2_mount", cgroupPath,
 		"--time_limit", fmt.Sprintf("%d", resource.WallTime),
 		"--cgroup_mem_max", fmt.Sprintf("%d", resource.Memory*1024),
 		"--rlimit_nproc", fmt.Sprintf("%d", resource.MaxProcess),
@@ -185,17 +203,21 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 	execution.Stderr = &stderrBuf
 	execution.Stdout = &stdoutBuf
 
+	startTime := time.Now()
 	err = execution.Start()
 
 	logWriter.Close()
 
 	err = execution.Wait()
+	result.DurationMs = time.Since(startTime).Milliseconds()
 
 	nsjailLogs := <-nsjailLogChan
 
 	result.Status = "ok"
 	result.Stderr = stderrBuf.String()
 	result.Stdout = stdoutBuf.String()
+
+	result.MemoryPeakKb = GetPeakMemory(cgroupPath)
 
 	if err != nil {
 
