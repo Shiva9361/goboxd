@@ -267,8 +267,6 @@ func nsjailTest() (bool, string) {
 
 	out, err := cmd.CombinedOutput()
 
-	log.Println("NSJAIL smoke test output: ", string(out), " error: ", err)
-
 	if err != nil {
 		return false, "nsjail is not installed or not working properly"
 	}
