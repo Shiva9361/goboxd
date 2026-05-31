@@ -126,6 +126,27 @@ func (c *CodeRunner) Initialize() {
 
 }
 
+func mapStatus(err error, nsjailLogs string) string {
+	if err == nil {
+		return "ok"
+	}
+
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		exitCode := exitErr.ExitCode()
+
+		if strings.Contains(nsjailLogs, "run time >= time limit") {
+			return "time_exceeded"
+		} else if exitCode == 139 {
+			// SEGV = oom >:(
+			return "memory_exceeded"
+		} else {
+			return "runtime_error"
+		}
+
+	}
+	return "internal_error"
+}
+
 // ExecuteSanboxed is the wrapper function for running the code in nsjail
 func (c *CodeRunner) ExecuteSandboxed(uid string, cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
 	result := ExecResult{}
@@ -210,33 +231,12 @@ func (c *CodeRunner) ExecuteSandboxed(uid string, cmd string, args []string, res
 
 	nsjailLogs := <-nsjailLogChan
 
-	result.Status = "ok"
 	result.Stderr = stderrBuf.String()
 	result.Stdout = stdoutBuf.String()
 
 	result.MemoryPeakKb = GetPeakMemory(cgroupPath)
 
-	if err != nil {
-
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			exitCode := exitErr.ExitCode()
-
-			if strings.Contains(nsjailLogs, "run time >= time limit") {
-				result.Status = "time_exceeded"
-			} else if exitCode == 139 {
-				// SEGV = oom >:(
-				result.Status = "memory_exceeded"
-			} else {
-				result.Status = "runtime_error"
-			}
-
-		} else {
-			result.Status = "internal_error"
-		}
-
-		// log.Println("Exec failed with : ", err)
-		return result
-	}
+	result.Status = mapStatus(err, nsjailLogs)
 
 	return result
 }
