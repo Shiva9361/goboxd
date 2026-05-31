@@ -37,8 +37,22 @@ make run
 The server listens on the default Gin port.
 
 ### Unit Tests
+- test file corresponding to each file is present alongside it.
+```bash
+make test
+```
 
+### Integration Tests
+- 5 test files for each langauage that is supported
+```bash
+make integration
+```
 
+### Benchmarks
+- uses hey
+```bash
+make benchmark
+```
 
 ### API Endpoints
 
@@ -55,3 +69,4 @@ Language configurations and sandbox flags are managed in `config/settings.yaml`.
 Detailed information is available in the `docs/` directory:
 - [Architecture](docs/architecture.md)
 - [API Reference](docs/api.md)
+- [Benchmarks](docs/benchmarks.md)
