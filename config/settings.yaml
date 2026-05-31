@@ -75,13 +75,27 @@ languages:
       args: ["-V"]
       limits: { wall_time_s: 3, memory_kb: 1048576, max_processes: 100 }
 
-nsjail_flags: ["-Mo", "-Q", # Q is for really quite - only fatal stuff will be logged
+  - id: js
+    name: JavaScript
+    source: solution.js
+    run:
+      cmd: /usr/bin/node
+      args: ["{{source}}"]
+      limits: { wall_time_s: 9, memory_kb: 102400, max_processes: 100 }
+    smoke:
+      cmd: /usr/bin/node
+      args: ["--version"]
+      limits: { wall_time_s: 3, memory_kb: 102400, max_processes: 100 }
+
+nsjail_flags: ["-Mo", 
+    # "-Q", # Q is for really quite - only fatal stuff will be logged
     "-E", "PATH=/usr/local/bin:/usr/bin:/bin",
     "--chroot", "/",
     "-R", "/etc",
     "-T", "/tmp",
     "--cwd", "/app",
-    "--log_fd" , "3" # To redirect logs
+    "--log_fd" , "3", # To redirect logs
+    "--use_cgroupv2",
     # "-v"
     ]
 std_limit: 102400
