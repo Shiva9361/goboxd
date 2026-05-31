@@ -62,7 +62,7 @@ func NewServer() *Server {
 	runner := &CodeRunner{}
 	runner.Initialize()
 
-	limit := runtime.NumCPU() // Gin does not restrict requests, if we spawn too many nsjail, we will probably crash.
+	limit := runtime.NumCPU() - 2 // Gin does not restrict requests, if we spawn too many nsjail, we will probably crash.
 
 	if envLimit := os.Getenv("EXECUTION_CONCURRENCY_LIMIT"); envLimit != "" {
 		if parsedLimit, err := strconv.Atoi(envLimit); err == nil && parsedLimit > 0 {
