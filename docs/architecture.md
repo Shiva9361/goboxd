@@ -18,7 +18,7 @@ goboxd is a secure code execution service that runs user-submitted code in a san
 ### 3. Sandbox Environment
 - **nsjail**: A light-weight process isolation tool for Linux.
 - **Temporary Workspaces**: Each execution gets a unique temporary directory mounted into the jail, which is cleaned up immediately after execution.
-- **Resource Constraints**: Wall time and memory limits are enforced at the sandbox level.
+- **Resource Constraints**: Wall time and memory limits are enforced at the sandbox level. Memory limits are managed via cgroups to avoid OOM issues with languages like Java and JavaScript.
 
 ## Execution Flow
 1. **Request Validation**: Validates the language and payload structure.
