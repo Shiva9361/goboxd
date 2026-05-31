@@ -7,7 +7,7 @@ goboxd is a secure code execution service that runs user-submitted code in a san
 
 ### 1. API Server (`internal/server.go`)
 - Built with the Gin web framework.
-- Handles incoming HTTP requests for code execution.
+- Handles incoming HTTP requests for code execution and health/readiness checks.
 - Manages unique UIDs for process isolation to prevent cross-process interference in the sandbox.
 
 ### 2. Code Runner (`internal/coderunner.go`)
