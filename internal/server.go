@@ -135,13 +135,13 @@ func (server *Server) postRun(c *gin.Context) {
 		req.SourceFilename = currentConfig.SourceFilename
 	}
 
-	req.SourceFilename = filepath.Base(req.SourceFilename) // simple but effective ;)
+	req.SourceFilename = sanitizeFilename(req.SourceFilename)
 
 	if req.ArtifactFilename == "" {
 		req.ArtifactFilename = currentConfig.Artifact
 	}
 
-	req.ArtifactFilename = filepath.Base(req.ArtifactFilename)
+	req.ArtifactFilename = sanitizeFilename(req.ArtifactFilename)
 
 	sourcePath := filepath.Join(workDir, req.SourceFilename)
 	if err := os.WriteFile(sourcePath, []byte(req.Source), 0644); err != nil {

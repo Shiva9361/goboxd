@@ -72,6 +72,10 @@ func clampResource[T cmp.Ordered](defaultValue T, requestedValue T) T {
 	return defaultValue
 }
 
+func sanitizeFilename(filename string) string {
+	return filepath.Base(filename)
+}
+
 func sanitizeLimits(defaultLimits Resource, requestedLimits Resource) Resource {
 	limits := Resource{
 		WallTime:   clampResource(defaultLimits.WallTime, requestedLimits.WallTime), // cool way to write instead of if else
