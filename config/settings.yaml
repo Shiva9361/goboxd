@@ -57,6 +57,23 @@ languages:
       cmd: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
       args: ["{{artifact}}"]
       limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
+  
+  - id: verilog
+    name: Verilog
+    source: solution.v
+    artifact: solution
+    build:
+      cmd: /usr/bin/iverilog
+      args: ["{{flags}}", "-o", "{{artifact}}", "{{source}}"]
+      limits: { wall_time_s: 6, memory_kb: 1024000, max_processes: 100 }
+      flag_allowlist: ["-full64","-debug","-O0","-O1","-O2","-O3"]
+    run:
+      cmd: ./{{artifact}}
+      limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
+    smoke:
+      cmd: /usr/bin/iverilog
+      args: ["-V"]
+      limits: { wall_time_s: 3, memory_kb: 1048576, max_processes: 100 }
 
 nsjail_flags: ["-Mo", "-Q", # Q is for really quite - only fatal stuff will be logged
     "-E", "PATH=/usr/local/bin:/usr/bin:/bin",
