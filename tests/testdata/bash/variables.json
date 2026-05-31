@@ -1,0 +1,16 @@
+{
+  "name": "Bash Variables",
+  "language": "bash",
+  "source": "A='hello'\nB='world'\necho \"$A $B\"",
+  "run": {
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 32768
+    }
+  },
+  "tests": [
+    {
+      "expected_stdout": "hello world\n"
+    }
+  ]
+}

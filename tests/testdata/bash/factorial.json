@@ -1,0 +1,21 @@
+{
+  "name": "Bash Factorial",
+  "language": "bash",
+  "source": "read n\nfact=1\nfor ((i=1; i<=n; i++)); do fact=$((fact * i)); done\necho $fact",
+  "run": {
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 32768
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5",
+      "expected_stdout": "120\n"
+    },
+    {
+      "stdin": "10",
+      "expected_stdout": "3628800\n"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Bash Prime Check",
+  "language": "bash",
+  "source": "read n\nif [ $n -lt 2 ]; then echo 'Not Prime'; exit; fi\nfor ((i=2; i*i<=n; i++)); do\n  if [ $((n % i)) -eq 0 ]; then echo 'Not Prime'; exit; fi\ndone\necho 'Prime'",
+  "run": {
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 32768
+    }
+  },
+  "tests": [
+    {
+      "stdin": "7",
+      "expected_stdout": "Prime\n"
+    },
+    {
+      "stdin": "10",
+      "expected_stdout": "Not Prime\n"
+    },
+    {
+      "stdin": "13",
+      "expected_stdout": "Prime\n"
+    }
+  ]
+}

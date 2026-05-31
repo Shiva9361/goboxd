@@ -100,6 +100,18 @@ languages:
       cmd: /usr/bin/node
       args: ["--version"]
       limits: { wall_time_s: 3, memory_kb: 102400, max_processes: 100 }
+  
+  - id: bash
+    name: Bash
+    source: solution.sh
+    run:
+      cmd: /bin/bash
+      args: ["{{source}}"]
+      limits: { wall_time_s: 9, memory_kb: 102400, max_processes: 100 }
+    smoke:
+      cmd: /bin/bash
+      args: ["--version"]
+      limits: { wall_time_s: 3, memory_kb: 102400, max_processes: 100 }
 
 nsjail_flags: ["-Mo", 
     "-Q", # Q is for really quite - only fatal stuff will be logged

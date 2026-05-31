@@ -1,0 +1,16 @@
+{
+  "name": "Bash Loop",
+  "language": "bash",
+  "source": "for i in {1..5}; do echo $i; done",
+  "run": {
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 32768
+    }
+  },
+  "tests": [
+    {
+      "expected_stdout": "1\n2\n3\n4\n5\n"
+    }
+  ]
+}
