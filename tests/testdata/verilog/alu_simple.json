@@ -1,0 +1,27 @@
+{
+  "name": "Verilog Simple ALU",
+  "language": "verilog",
+  "source_filename": "solution.v",
+  "artifact_filename": "solution",
+  "source": "module top;\n  integer a, b, op, r;\n  initial begin\n    r = $fscanf(32'h8000_0000, \"%d %d %d\", a, b, op);\n    while (r == 3) begin\n      case (op)\n        0: $display(\"%0d\", a + b);\n        1: $display(\"%0d\", a - b);\n        2: $display(\"%0d\", a & b);\n        3: $display(\"%0d\", a | b);\n        default: $display(\"error\");\n      endcase\n      r = $fscanf(32'h8000_0000, \"%d %d %d\", a, b, op);\n    end\n    $finish;\n  end\nendmodule",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 102400
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "10 5 0\n10 5 1\n12 7 2\n12 7 3\n",
+      "expected_stdout": "15\n5\n4\n15\n"
+    }
+  ]
+}

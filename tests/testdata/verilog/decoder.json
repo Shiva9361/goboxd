@@ -1,0 +1,27 @@
+{
+  "name": "Verilog Decoder",
+  "language": "verilog",
+  "source_filename": "solution.v",
+  "artifact_filename": "solution",
+  "source": "module top;\n  integer sel, r;\n  initial begin\n    r = $fscanf(32'h8000_0000, \"%d\", sel);\n    while (r == 1) begin\n      case (sel)\n        0: $display(\"0001\");\n        1: $display(\"0010\");\n        2: $display(\"0100\");\n        3: $display(\"1000\");\n        default: $display(\"0000\");\n      endcase\n      r = $fscanf(32'h8000_0000, \"%d\", sel);\n    end\n    $finish;\n  end\nendmodule",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 102400
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "0\n1\n2\n3\n",
+      "expected_stdout": "0001\n0010\n0100\n1000\n"
+    }
+  ]
+}

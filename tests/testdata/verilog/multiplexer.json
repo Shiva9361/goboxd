@@ -1,0 +1,27 @@
+{
+  "name": "Verilog Multiplexer",
+  "language": "verilog",
+  "source_filename": "solution.v",
+  "artifact_filename": "solution",
+  "source": "module top;\n  integer i0, i1, i2, i3, sel, r;\n  initial begin\n    r = $fscanf(32'h8000_0000, \"%d %d %d %d %d\", i0, i1, i2, i3, sel);\n    while (r == 5) begin\n      case (sel)\n        0: $display(\"%0d\", i0);\n        1: $display(\"%0d\", i1);\n        2: $display(\"%0d\", i2);\n        3: $display(\"%0d\", i3);\n        default: $display(\"x\");\n      endcase\n      r = $fscanf(32'h8000_0000, \"%d %d %d %d %d\", i0, i1, i2, i3, sel);\n    end\n    $finish;\n  end\nendmodule",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 102400
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "10 20 30 40 2\n5 6 7 8 0\n",
+      "expected_stdout": "30\n5\n"
+    }
+  ]
+}

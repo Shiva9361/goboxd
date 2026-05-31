@@ -83,7 +83,7 @@ func TestLanguages(t *testing.T) {
 
 			assert.Equal(t, len(tc.Tests), len(resp.Tests))
 			for i, testResult := range resp.Tests {
-				assert.Equal(t, "ok", testResult.Status, "Test case %d failed. Stderr: %s", i, testResult.Stderr)
+				assert.Equal(t, "accepted", testResult.Status, "Test case %d failed. Stderr: %s", i, testResult.Stderr)
 				assert.Equal(t, tc.Tests[i].ExpectedStdout, testResult.Stdout, "Test case %d output mismatch", i)
 			}
 		})

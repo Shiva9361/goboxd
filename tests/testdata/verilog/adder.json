@@ -1,0 +1,27 @@
+{
+  "name": "Verilog Adder",
+  "language": "verilog",
+  "source_filename": "solution.v",
+  "artifact_filename": "solution",
+  "source": "module top;\n  integer a, b, r;\n  initial begin\n    r = $fscanf(32'h8000_0000, \"%d %d\", a, b);\n    while (r == 2) begin\n      $display(\"%0d\", a + b);\n      r = $fscanf(32'h8000_0000, \"%d %d\", a, b);\n    end\n    $finish;\n  end\nendmodule",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 102400
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5 10\n20 30\n",
+      "expected_stdout": "15\n50\n"
+    }
+  ]
+}

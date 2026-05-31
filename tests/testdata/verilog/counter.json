@@ -1,0 +1,27 @@
+{
+  "name": "Verilog Counter",
+  "language": "verilog",
+  "source_filename": "solution.v",
+  "artifact_filename": "solution",
+  "source": "module top;\n  integer n, i, r;\n  reg [3:0] count;\n  initial begin\n    r = $fscanf(32'h8000_0000, \"%d\", n);\n    if (r == 1) begin\n      count = 0;\n      for (i = 0; i < n; i = i + 1) begin\n        $display(\"%0d\", count);\n        count = count + 1;\n      end\n    end\n    $finish;\n  end\nendmodule",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 102400
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 2,
+      "memory_kb": 65536
+    }
+  },
+  "tests": [
+    {
+      "stdin": "4\n",
+      "expected_stdout": "0\n1\n2\n3\n"
+    }
+  ]
+}
