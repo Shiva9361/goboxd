@@ -4,6 +4,12 @@ goboxd is a secure code execution service that runs user-provided source code in
 
 Using gin as it does not require too much overhead, widely used and is pretty performant. Morover it is easy to add middleware for basically anything in the future.
 
+Nsjail's r_limit_as enforces limit on virtual memory. This leads to java and javascript crashing with oom even before executing the program. What 
+we need is physical memory limit, this is provided by cgroup. The issue is that cgroup along with docker can be a security risk. Given docker is 
+just for dev and testing it should be fine. But if deployed, a ephemeral vm or a complete system instead of docker should be used. 
+
+The above is from my understanding, feel free to correct me if I am wrong.
+
 ## Features
 
 - **Sandboxed Execution**: Uses nsjail to isolate processes, providing filesystem, network, and resource isolation.
