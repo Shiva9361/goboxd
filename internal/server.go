@@ -1,14 +1,13 @@
 package internal
 
 import (
-	"crypto/rand"
 	"fmt"
-	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -16,8 +15,9 @@ import (
 )
 
 type Server struct {
-	Runner *CodeRunner
-	Router *gin.Engine
+	Runner  *CodeRunner
+	Router  *gin.Engine
+	uidPool chan string
 }
 
 type ComponentStatus struct {
@@ -34,37 +34,50 @@ type SmokeResponse struct {
 
 var activeUIDs sync.Map
 
-// getUniqueUID generates a random UID and ensures it is not currently in use
-func getUniqueUID() string {
-	for { // this basically makes a tread wait until it can get a unique UID
-		n, err := rand.Int(rand.Reader, big.NewInt(100000))
-		if err != nil {
-			log.Panicln("Failed to generate random number:", err)
-		}
+// // getUniqueUID generates a random UID and ensures it is not currently in use
+// func getUniqueUID() string {
+// 	for { // this basically makes a tread wait until it can get a unique UID
+// 		n, err := rand.Int(rand.Reader, big.NewInt(100000))
+// 		if err != nil {
+// 			log.Panicln("Failed to generate random number:", err)
+// 		}
 
-		uid := 100000 + n.Int64()
-		uidStr := fmt.Sprintf("%d", uid)
+// 		uid := 100000 + n.Int64()
+// 		uidStr := fmt.Sprintf("%d", uid)
 
-		_, loaded := activeUIDs.LoadOrStore(uidStr, true)
-		if !loaded {
-			return uidStr
-		}
+// 		_, loaded := activeUIDs.LoadOrStore(uidStr, true)
+// 		if !loaded {
+// 			return uidStr
+// 		}
 
-	}
-}
+// 	}
+// }
 
-// releaseUID frees the UID back to the pool when the run finishes
-func releaseUID(uidStr string) {
-	activeUIDs.Delete(uidStr)
-}
+// // releaseUID frees the UID back to the pool when the run finishes
+// func releaseUID(uidStr string) {
+// 	activeUIDs.Delete(uidStr)
+// }
 
 func NewServer() *Server {
 	runner := &CodeRunner{}
 	runner.Initialize()
 
+	limit := runtime.NumCPU() // Gin does not restrict requests, if we spawn too many nsjail, we will probably crash.
+
+	if envLimit := os.Getenv("EXECUTION_CONCURRENCY_LIMIT"); envLimit != "" {
+		if parsedLimit, err := strconv.Atoi(envLimit); err == nil && parsedLimit > 0 {
+			limit = parsedLimit
+		}
+	}
+
 	Server := &Server{
-		Router: gin.Default(),
-		Runner: runner,
+		Router:  gin.Default(),
+		Runner:  runner,
+		uidPool: make(chan string, limit),
+	}
+
+	for i := 0; i < limit; i++ {
+		Server.uidPool <- fmt.Sprintf("%d", 100000+i)
 	}
 
 	Server.route()
@@ -149,7 +162,12 @@ func (server *Server) postRun(c *gin.Context) {
 	buildLimits := sanitizeLimits(currentConfig.BuildOptions.Limits, req.Build.Limits)
 
 	// Build
-	buildResult := server.Runner.ExecuteSandboxed(currentConfig.BuildOptions.Cmd, buildArgs, buildLimits, "", workDir)
+	uid := <-server.uidPool
+
+	defer func() {
+		server.uidPool <- uid
+	}()
+	buildResult := server.Runner.ExecuteSandboxed(uid, currentConfig.BuildOptions.Cmd, buildArgs, buildLimits, "", workDir)
 
 	if buildResult.Status != "" {
 		res.Build = &buildResult
@@ -175,7 +193,7 @@ func (server *Server) postRun(c *gin.Context) {
 	runLimits := sanitizeLimits(currentConfig.RunOptions.Limits, req.Run.Limits)
 
 	for _, input := range req.Tests {
-		out := server.Runner.ExecuteSandboxed(runCmd, runArgs, runLimits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
+		out := server.Runner.ExecuteSandboxed(uid, runCmd, runArgs, runLimits, input.Stdin, workDir) // TODO: do checks on flags, on error we need to fix things
 		if out.Stdout != input.ExpectedStdout {
 
 			trimmedOutput := strings.TrimSpace(out.Stdout)
@@ -242,7 +260,13 @@ func (server *Server) getReady(c *gin.Context) {
 			continue
 		}
 
-		out := server.Runner.ExecuteSandboxed(config.SmokeOptions.Cmd, config.SmokeOptions.Args, config.SmokeOptions.Limits, "", workDir)
+		uid := <-server.uidPool
+
+		defer func() {
+			server.uidPool <- uid
+		}()
+
+		out := server.Runner.ExecuteSandboxed(uid, config.SmokeOptions.Cmd, config.SmokeOptions.Args, config.SmokeOptions.Limits, "", workDir)
 		if out.Status != "ok" && out.Status != "" { // ignoring ones with no smoke test configured (Looking at you java)
 			if res.Status == "ok" {
 				res.Status = "degraded"

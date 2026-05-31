@@ -127,16 +127,13 @@ func (c *CodeRunner) Initialize() {
 }
 
 // ExecuteSanboxed is the wrapper function for running the code in nsjail
-func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
+func (c *CodeRunner) ExecuteSandboxed(uid string, cmd string, args []string, resource Resource, stdInput string, workDir string) ExecResult {
 	result := ExecResult{}
 	if cmd == "" {
 		return result
 	}
 
 	logReader, logWriter, err := os.Pipe()
-
-	uid := getUniqueUID()
-	defer releaseUID(uid)
 
 	cgroupPath, err := os.MkdirTemp("/sys/fs/cgroup", "goboxd_*")
 	if err != nil {
