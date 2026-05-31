@@ -230,7 +230,7 @@ func (server *Server) getReady(c *gin.Context) {
 	}
 
 	for _, config := range server.Runner.Configs {
-		if (config.SmokeOptions.Cmd == "") || (config.SmokeOptions.Args == nil) {
+		if config.SmokeOptions.Cmd == "" {
 			continue // skip this lang
 		}
 		langResponse := ComponentStatus{
@@ -251,7 +251,7 @@ func (server *Server) getReady(c *gin.Context) {
 			langResponse.Ok = false
 			langResponse.Error = out.Stderr
 		} else {
-			langResponse.Version = out.Stdout
+			langResponse.Version = strings.Split(out.Stdout, "\n")[0] // gcc, g++ were printing too much
 		}
 		res.LanguagesOutput[config.ID] = langResponse
 	}
