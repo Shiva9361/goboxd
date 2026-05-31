@@ -155,7 +155,7 @@ func (server *Server) postRun(c *gin.Context) {
 		res.Build = &buildResult
 	}
 
-	if buildResult.Status != "ok" {
+	if buildResult.Status != "ok" && buildResult.Status != "" {
 		res.Status = "build_failed"
 		for range req.Tests {
 			res.Tests = append(res.Tests, ExecResult{
