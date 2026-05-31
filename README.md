@@ -2,6 +2,8 @@
 
 goboxd is a secure code execution service that runs user-provided source code in isolated sandboxes using Linux namespaces and nsjail.
 
+Using gin as it does not require too much overhead, widely used and is pretty performant. Morover it is easy to add middleware for basically anything in the future.
+
 ## Features
 
 - **Sandboxed Execution**: Uses nsjail to isolate processes, providing filesystem, network, and resource isolation.
