@@ -9,15 +9,15 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	Runner  *CodeRunner
-	Router  *gin.Engine
-	uidPool chan string
+	Runner       *CodeRunner
+	Router       *gin.Engine
+	uidPool      chan string
+	requestLimit int64
 }
 
 type ComponentStatus struct {
@@ -32,7 +32,7 @@ type SmokeResponse struct {
 	LanguagesOutput map[string]ComponentStatus `json:"languages"`
 }
 
-var activeUIDs sync.Map
+// var activeUIDs sync.Map
 
 // // getUniqueUID generates a random UID and ensures it is not currently in use
 // func getUniqueUID() string {
@@ -70,10 +70,19 @@ func NewServer() *Server {
 		}
 	}
 
+	requestLimit := int64(1024 * 1024 * 10) // 10MB default response limit
+
+	if envResponseLimit := os.Getenv("REQUEST_SIZE_LIMIT"); envResponseLimit != "" {
+		if parsedLimit, err := strconv.ParseInt(envResponseLimit, 10, 64); err == nil && parsedLimit > 0 {
+			requestLimit = parsedLimit
+		}
+	}
+
 	Server := &Server{
-		Router:  gin.Default(),
-		Runner:  runner,
-		uidPool: make(chan string, limit),
+		Router:       gin.Default(),
+		Runner:       runner,
+		uidPool:      make(chan string, limit),
+		requestLimit: requestLimit,
 	}
 
 	for i := 0; i < limit; i++ {
@@ -84,9 +93,16 @@ func NewServer() *Server {
 	return Server
 }
 
+func MaxAllowedSize(limit int64) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, limit)
+		c.Next()
+	}
+}
+
 func (Server *Server) route() {
 	Server.Router.GET("/healthz", Server.getHealth)
-	Server.Router.POST("/run", Server.postRun)
+	Server.Router.POST("/run", MaxAllowedSize(Server.requestLimit), Server.postRun)
 	Server.Router.GET("/readyz", Server.getReady)
 }
 

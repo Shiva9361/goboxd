@@ -27,3 +27,8 @@ goboxd is a secure code execution service that runs user-submitted code in a san
 4. **Execution**: Runs the resulting artifact/script for each provided test case inside `nsjail`.
 5. **Result Aggregation**: Collects stdout, stderr, and execution metrics to return to the client.
 6. **Cleanup**: Deletes the temporary workspace and releases the unique UID.
+
+## Environment Variables
+- PORT : The port on which the API server listens (default: 8080).
+- EXECUTION_CONCURRENCY_LIMIT : Maximum number of concurrent executions (default: cpu - 2).
+- REQUEST_SIZE_LIMIT : Maximum size of the request payload in bytes (default: 10MB).
