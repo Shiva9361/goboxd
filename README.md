@@ -14,7 +14,7 @@ The above is from my understanding, feel free to correct me if I am wrong.
 
 - **Sandboxed Execution**: Uses nsjail to isolate processes, providing filesystem, network, and resource isolation.
 - **Resource Management**: Enforces limits on wall-time, memory usage, and maximum process count.
-- **Multi-language Support**: Configurable support for C, C++, and Python 3 currently.
+- **Multi-language Support**: Configurable support for C, C++, Python 3, Java and Javascript currently.
 - **API-Driven**: Provides HTTP endpoints for health monitoring, readiness checks, and code execution.
 - **Automated Testing**: Supports executing multiple test cases per request with stdin and expected stdout validation.
 
