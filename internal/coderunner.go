@@ -137,11 +137,15 @@ func (c *CodeRunner) ExecuteSandboxed(cmd string, args []string, resource Resour
 	uid := getUniqueUID()
 	defer releaseUID(uid)
 
+	// nsjail r_limit on memory is on virtual memory that is why java and js were both not able to run
+	// cgroups is physical memory limit and works for all languages but requires privileged nsjail :(
+	// For now to let stuff work i am gonna go with cgroups and privileged nsjail
 	nsjailArgs := []string{
 		"--user", uid, "--group", uid,
 		"-B", fmt.Sprintf("%s:/app", workDir),
 		"--time_limit", fmt.Sprintf("%d", resource.WallTime),
-		"--rlimit_as", fmt.Sprintf("%d", resource.Memory/1024),
+		"--cgroup_mem_max", fmt.Sprintf("%d", resource.Memory*1024),
+		"--rlimit_nproc", fmt.Sprintf("%d", resource.MaxProcess),
 	}
 
 	nsjailArgs = append(nsjailArgs, c.NsjailFlags...)
