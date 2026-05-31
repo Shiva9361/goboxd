@@ -34,6 +34,7 @@ type CodeConfig struct {
 	Artifact       string  `mapstructure:"artifact"`
 	BuildOptions   Options `mapstructure:"build"`
 	RunOptions     Options `mapstructure:"run"`
+	SmokeOptions   Options `mapstructure:"smoke"`
 }
 
 // CodeRunner is the main struct that holds all the config for supported languages and a map for quick lookup

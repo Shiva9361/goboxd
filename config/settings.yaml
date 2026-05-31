@@ -6,6 +6,10 @@ languages:
       cmd: /usr/bin/python3
       args: ["{{source}}"]
       limits: { wall_time_s: 9, memory_kb: 102400, max_processes: 100 }
+    smoke:
+      cmd: /usr/bin/python3
+      args: ["--version"]
+      limits: { wall_time_s: 3, memory_kb: 102400, max_processes: 100 } 
 
   - id: cpp
     name: C++
@@ -19,6 +23,10 @@ languages:
     run:
       cmd: ./{{artifact}}
       limits: { wall_time_s: 3, memory_kb: 524288, max_processes: 64 }
+    smoke:
+      cmd: /usr/bin/g++
+      args: ["--version"]
+      limits: { wall_time_s: 3, memory_kb: 1048576, max_processes: 100 }
 
   - id: c
     name: c
@@ -32,6 +40,10 @@ languages:
     run:
       cmd: ./{{artifact}}
       limits: { wall_time_s: 3, memory_kb: 524288, max_processes: 64 }
+    smoke:
+      cmd: /usr/bin/gcc
+      args: ["--version"]
+      limits: { wall_time_s: 3, memory_kb: 1048576, max_processes: 100 }
 
   - id: java
     name: Java
@@ -46,7 +58,7 @@ languages:
       args: ["{{artifact}}"]
       limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
 
-nsjail_flags: ["-Mo", "--quiet",
+nsjail_flags: ["-Mo", "-Q", # Q is for really quite - only fatal stuff will be logged
     "-E", "PATH=/usr/local/bin:/usr/bin:/bin",
     "--chroot", "/",
     "-R", "/etc",

@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -17,6 +18,18 @@ import (
 type Server struct {
 	Runner *CodeRunner
 	Router *gin.Engine
+}
+
+type ComponentStatus struct {
+	Ok      bool   `json:"ok"`
+	Version string `json:"version,omitempty"`
+	Error   string `json:"error,omitempty"`
+}
+
+type SmokeResponse struct {
+	Status          string                     `json:"status"`
+	NsjailOutput    ComponentStatus            `json:"nsjail"`
+	LanguagesOutput map[string]ComponentStatus `json:"languages"`
 }
 
 var activeUIDs sync.Map
@@ -61,6 +74,7 @@ func NewServer() *Server {
 func (Server *Server) route() {
 	Server.Router.GET("/healthz", Server.getHealth)
 	Server.Router.POST("/run", Server.postRun)
+	Server.Router.GET("/readyz", Server.getReady)
 }
 
 func (server *Server) getHealth(c *gin.Context) {
@@ -183,4 +197,79 @@ func (server *Server) postRun(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 
+}
+
+func (server *Server) getReady(c *gin.Context) {
+	res := SmokeResponse{
+		Status:          "ok",
+		LanguagesOutput: make(map[string]ComponentStatus),
+	}
+
+	workDir, err := os.MkdirTemp("", "*_goboxd")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not create temp dir",
+		})
+		return
+	}
+
+	defer os.RemoveAll(workDir)
+
+	status, log := nsjailTest()
+	if status == false {
+		res.Status = "down"
+		res.NsjailOutput = ComponentStatus{
+			Ok:    false,
+			Error: log,
+		}
+	} else {
+		res.NsjailOutput = ComponentStatus{
+			Ok:      true,
+			Version: log,
+		}
+	}
+
+	for _, config := range server.Runner.Configs {
+		if (config.SmokeOptions.Cmd == "") || (config.SmokeOptions.Args == nil) {
+			continue // skip this lang
+		}
+		langResponse := ComponentStatus{
+			Ok: true,
+		}
+		if res.Status == "down" {
+			langResponse.Ok = false
+			langResponse.Error = "nsjail is not working, so smoke test could not be run"
+			continue
+		}
+
+		out := server.Runner.ExecuteSandboxed(config.SmokeOptions.Cmd, config.SmokeOptions.Args, config.SmokeOptions.Limits, "", workDir)
+		if out.Status != "ok" && out.Status != "" { // ignoring ones with no smoke test configured (Looking at you java)
+			if res.Status == "ok" {
+				res.Status = "degraded"
+			}
+
+			langResponse.Ok = false
+			langResponse.Error = out.Stderr
+		} else {
+			langResponse.Version = out.Stdout
+		}
+		res.LanguagesOutput[config.ID] = langResponse
+	}
+	if res.Status != "ok" {
+		c.JSON(503, res)
+	} else {
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func nsjailTest() (bool, string) {
+	cmd := exec.Command("nsjail", "--help") // there is no --version as far as i can see :(
+
+	out, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return false, "nsjail is not installed or not working properly"
+	}
+
+	return true, strings.Split(string(out), "\n")[0]
 }
