@@ -51,12 +51,26 @@ languages:
     artifact_filename_strategy: from_request  
     build:
       cmd: /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
-      args: ["{{flags}}", "{{source}}"]
-      limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
+      args: [
+        "-J-Xmx192M",
+        "-J-Xms16M",
+        "-J-Xss256k",
+        "{{flags}}",
+        "{{source}}"
+      ]
+      limits: { wall_time_s: 10, memory_kb: 2621445, max_processes: 250 }
     run:
       cmd: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
-      args: ["{{artifact}}"]
-      limits: { wall_time_s: 6, memory_kb: 10240000, max_processes: 100 }
+      args: [
+        "-Xmx192M",
+        "-Xms16M",
+        "-Xss256k",
+        "-XX:+UseSerialGC",
+        "-XX:MaxMetaspaceSize=64M",
+        "-XX:TieredStopAtLevel=1",
+        "{{artifact}}"
+      ]
+      limits: { wall_time_s: 10, memory_kb: 2621445, max_processes: 250 }
   
   - id: verilog
     name: Verilog

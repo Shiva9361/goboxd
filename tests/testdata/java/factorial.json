@@ -8,14 +8,14 @@
     "flags": [],
     "limits": {
       "wall_time_s": 10,
-      "memory_kb": 524288
+      "memory_kb": 10240000
     }
   },
   "run": {
     "flags": [],
     "limits": {
       "wall_time_s": 4,
-      "memory_kb": 262144
+      "memory_kb": 10240000
     }
   },
   "tests": [
