@@ -1,0 +1,27 @@
+{
+  "name": "Java Fibonacci",
+  "language": "java",
+  "source_filename": "Solution.java",
+  "artifact_filename": "Solution",
+  "source": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            long a = 0, b = 1;\n            for (int i = 0; i < n; i++) {\n                System.out.print(a + (i == n - 1 ? \"\" : \" \"));\n                long temp = a + b;\n                a = b;\n                b = temp;\n            }\n            System.out.println();\n        }\n    }\n}",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 524288
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 4,
+      "memory_kb": 262144
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n",
+      "expected_stdout": "0 1 1 2 3\n"
+    }
+  ]
+}

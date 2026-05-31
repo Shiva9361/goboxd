@@ -1,0 +1,27 @@
+{
+  "name": "Java Factorial",
+  "language": "java",
+  "source_filename": "Solution.java",
+  "artifact_filename": "Solution",
+  "source": "import java.util.Scanner;\n\npublic class Solution {\n    public static long factorial(int n) {\n        if (n == 0) return 1;\n        return n * factorial(n - 1);\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        while (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            System.out.println(factorial(n));\n        }\n    }\n}",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 524288
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 4,
+      "memory_kb": 262144
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n10\n0\n",
+      "expected_stdout": "120\n3628800\n1\n"
+    }
+  ]
+}

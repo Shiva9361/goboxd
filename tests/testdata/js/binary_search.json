@@ -1,0 +1,19 @@
+{
+  "name": "JS Binary Search",
+  "language": "js",
+  "source_filename": "solution.js",
+  "source": "const fs = require('fs');\nconst input = fs.readFileSync(0, 'utf8');\nconst parts = input.trim().split(/\\s+/).map(Number);\n\nif (parts.length > 0) {\n    const n = parts[0];\n    const arr = parts.slice(1, n + 1).sort((a, b) => a - b);\n    const target = parts[n + 1];\n    \n    let low = 0, high = arr.length - 1, found = -1;\n    while (low <= high) {\n        let mid = Math.floor((low + high) / 2);\n        if (arr[mid] === target) {\n            found = mid;\n            break;\n        } else if (arr[mid] < target) {\n            low = mid + 1;\n        } else {\n            high = mid - 1;\n        }\n    }\n    console.log(found >= 0 ? \"Found at \" + found : \"Not Found\");\n}",
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 131072
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n10 20 30 40 50\n30\n",
+      "expected_stdout": "Found at 2\n"
+    }
+  ]
+}

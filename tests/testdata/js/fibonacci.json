@@ -1,0 +1,19 @@
+{
+  "name": "JS Fibonacci",
+  "language": "js",
+  "source_filename": "solution.js",
+  "source": "const fs = require('fs');\nconst input = fs.readFileSync(0, 'utf8');\nconst n = parseInt(input.trim());\n\nif (!isNaN(n)) {\n    let a = 0n, b = 1n;\n    let res = [];\n    for (let i = 0; i < n; i++) {\n        res.push(a.toString());\n        let temp = a + b;\n        a = b;\n        b = temp;\n    }\n    console.log(res.join(' '));\n}",
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 131072
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n",
+      "expected_stdout": "0 1 1 2 3\n"
+    }
+  ]
+}

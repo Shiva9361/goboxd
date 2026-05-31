@@ -1,0 +1,19 @@
+{
+  "name": "JS Prime Check",
+  "language": "js",
+  "source_filename": "solution.js",
+  "source": "const fs = require('fs');\nconst input = fs.readFileSync(0, 'utf8');\nconst lines = input.trim().split(/\\s+/);\n\nfunction isPrime(n) {\n    if (n <= 1) return false;\n    for (let i = 2; i * i <= n; i++) {\n        if (n % i === 0) return false;\n    }\n    return true;\n}\n\nlines.forEach(line => {\n    if (line !== '') {\n        const n = parseInt(line);\n        console.log(isPrime(n) ? \"Prime\" : \"Not Prime\");\n    }\n});",
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 131072
+    }
+  },
+  "tests": [
+    {
+      "stdin": "7\n10\n13\n",
+      "expected_stdout": "Prime\nNot Prime\nPrime\n"
+    }
+  ]
+}

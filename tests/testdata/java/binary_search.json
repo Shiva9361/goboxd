@@ -1,0 +1,27 @@
+{
+  "name": "Java Binary Search",
+  "language": "java",
+  "source_filename": "Solution.java",
+  "artifact_filename": "Solution",
+  "source": "import java.util.Scanner;\nimport java.util.Arrays;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int[] arr = new int[n];\n            for (int i = 0; i < n; i++) arr[i] = sc.nextInt();\n            Arrays.sort(arr);\n            if (sc.hasNextInt()) {\n                int target = sc.nextInt();\n                int idx = Arrays.binarySearch(arr, target);\n                System.out.println(idx >= 0 ? \"Found at \" + idx : \"Not Found\");\n            }\n        }\n    }\n}",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 524288
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 4,
+      "memory_kb": 262144
+    }
+  },
+  "tests": [
+    {
+      "stdin": "5\n10 20 30 40 50\n30\n",
+      "expected_stdout": "Found at 2\n"
+    }
+  ]
+}

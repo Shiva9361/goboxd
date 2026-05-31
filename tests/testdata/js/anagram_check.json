@@ -1,0 +1,19 @@
+{
+  "name": "JS Anagram Check",
+  "language": "js",
+  "source_filename": "solution.js",
+  "source": "const fs = require('fs');\nconst input = fs.readFileSync(0, 'utf8');\nconst lines = input.trim().split(/\\n/);\n\nlines.forEach(line => {\n    const parts = line.trim().split(/\\s+/);\n    if (parts.length === 2) {\n        const s1 = parts[0].split('').sort().join('');\n        const s2 = parts[1].split('').sort().join('');\n        console.log(s1 === s2 ? \"Anagram\" : \"Not Anagram\");\n    }\n});",
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 5,
+      "memory_kb": 131072
+    }
+  },
+  "tests": [
+    {
+      "stdin": "listen silent\nhello world\n",
+      "expected_stdout": "Anagram\nNot Anagram\n"
+    }
+  ]
+}

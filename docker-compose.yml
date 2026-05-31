@@ -25,4 +25,5 @@ services:
     working_dir: /src
     profiles: ["tools"]
     privileged: true
+    cgroup: host
     entrypoint: []

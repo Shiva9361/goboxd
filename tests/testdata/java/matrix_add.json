@@ -1,0 +1,27 @@
+{
+  "name": "Java Matrix Add",
+  "language": "java",
+  "source_filename": "Solution.java",
+  "artifact_filename": "Solution",
+  "source": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int r = sc.nextInt();\n            int c = sc.nextInt();\n            int[][] m1 = new int[r][c];\n            int[][] m2 = new int[r][c];\n            for(int i=0; i<r; i++) for(int j=0; j<c; j++) m1[i][j] = sc.nextInt();\n            for(int i=0; i<r; i++) for(int j=0; j<c; j++) m2[i][j] = sc.nextInt();\n            for(int i=0; i<r; i++) {\n                for(int j=0; j<c; j++) {\n                    System.out.print((m1[i][j] + m2[i][j]) + (j == c - 1 ? \"\" : \" \"));\n                }\n                System.out.println();\n            }\n        }\n    }\n}",
+  "build": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 10,
+      "memory_kb": 524288
+    }
+  },
+  "run": {
+    "flags": [],
+    "limits": {
+      "wall_time_s": 4,
+      "memory_kb": 262144
+    }
+  },
+  "tests": [
+    {
+      "stdin": "2 2\n1 2\n3 4\n5 6\n7 8\n",
+      "expected_stdout": "6 8\n10 12\n"
+    }
+  ]
+}
