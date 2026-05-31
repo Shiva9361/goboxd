@@ -62,3 +62,11 @@ Generate a curl request for c++ for the server api that we already discussed abo
 Generated the required request
 **What we used / didn't use:**
 Used the request as is and also added it as a test case in cpp 
+
+## [2026-06-01] [Context: Test data for verilog]
+**Prompt**
+Make new test data for verilog following the conventions we put in place 5 different file similar to the other languages 
+**Response summary:**
+Generated the required test data for verilog
+**What we used / didn't use:**
+Used the generated test data as is, which saved me a lot of time. Would have been very time consuming to write them by hand and also to come up with the test cases myself, given my past with verilog (ptsd).
